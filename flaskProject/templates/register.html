@@ -1,0 +1,88 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+  	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='register.css') }}">
+	<title>Document</title>
+</head>
+<body>
+	<div class="navbar-container">
+		<div>
+			<p><a class="navbar-logo" href="{{url_for('index')}}"><span style="color:#00a3ff">Hydro</span>Homies Event Planner</a></p>
+		</div>
+		<div>
+			{% if user %}
+				<a class="navbar-button" href="/events">All Events</a>
+				<a class="navbar-button" href="/events/favorite/{{user_id}}">Favorite Events</a>
+				<a class="navbar-button" href="/logout">Logout</a>
+			{% else %}
+				<a class="navbar-button " href="/login">Login</a>
+				<a class="navbar-button" href="/register">Register</a>
+			{% endif %}
+		</div>
+	</div>
+	<div class="register-container">
+		<div class="register-card">
+			<form class="register-form" method="POST" action="{{url_for('register')}}">
+				<div class="register-field">
+					{{ form.firstname.label }} {{ form.firstname }}
+				</div>
+				{% if form.firstname.errors %}
+					<div class="list-errors">
+							{% for error in form.firstname.errors %}
+								<p>{{ error }}</p>
+							{% endfor %}
+					</div>
+				{% endif %}
+				<div class="register-field">
+					{{form.lastname.label}}{{form.lastname}}
+				</div>
+				{% if form.lastname.errors %}
+					<div class="list-errors">
+						{% for error in form.lastname.errors %}
+							<p>{{ error }}</p>
+						{% endfor %}
+					</div>
+				{% endif %}
+				<div class="register-field">
+					{{form.email.label}}{{form.email}}
+				</div>
+				{% if form.email.errors %}
+					<div class="list-errors">
+						{% for error in form.email.errors %}
+							<p>{{ error }}</p>
+						{% endfor %}
+					</div>
+				{% endif %}
+				<div class="register-field">
+					{{form.password.label}}{{form.password}}
+				</div>
+				{% if form.password.errors %}
+					<div class="list-errors">
+						{% for error in form.password.errors %}
+							<p>{{ error }}</p>
+						{% endfor %}
+					</div>
+				{% endif %}
+				<div class="register-field">
+					{{form.confirmPassword.label}}{{form.confirmPassword}}
+				</div>
+				{% if form.confirmPassword.errors %}
+					<div class="list-errors">
+						{% for error in form.confirmPassword.errors %}
+							<p>{{ error }}</p>
+						{% endfor %}
+					</div>
+				{% endif %}
+				<div class="register-submit">
+					{{form.submit}}
+				</div>
+			</form>
+		</div>
+	</div>
+	
+</body>
+</html>

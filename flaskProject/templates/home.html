@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+  	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='home.css') }}">
+	<title>Document</title>
+</head>
+<body>
+	<div class="navbar-container">
+		<div>
+			<p><a class="navbar-logo" href="{{url_for('index')}}"><span style="color:#00a3ff">Hydro</span>Homies Event Planner</a></p>
+		</div>
+		<div>
+			{% if user %}
+				<a class="navbar-button" href="/home">All Events</a>
+				<a class="navbar-button" href="/events/favorite/{{user_id}}">Favorite Events</a>
+				<a class="navbar-button" href="/logout">Logout</a>
+			{% else %}
+				<a class="navbar-button " href="/login">Login</a>
+				<a class="navbar-button" href="/register">Register</a>
+			{% endif %}
+		</div>
+	</div>
+
+	<div class="home-container">
+		{% for event in events %}
+			<div class="home-card">
+				<p style="
+					text-transform: capitalize;
+					font-size: 20px;
+					text-align: center;
+    				padding-top: 10px;
+					">{{event.title}}</p>
+				<p style="
+  					color: grey;
+					font-size: 12px;
+					text-align: center;
+				">{{event.date}}</p>
+				<div class="home-card-body">
+					<p>Description: {{event.description}}</p>
+				</div>
+			</div>
+		{% endfor %}
+	</div>
+</body>
+</html>
