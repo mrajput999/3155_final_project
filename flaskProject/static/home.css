@@ -5,6 +5,7 @@
   display: flex;
   flex-direction: column;
   margin-top: 40px;
+  border-radius: 5px;
 }
 
 .home-card > p {
@@ -21,5 +22,98 @@
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  padding-left: 5px;
+}
+
+.home-card-body > p {
+  text-overflow: ellipsis;
+  white-space: nowrap;
+  overflow: hidden;
+  padding: 5px;
+}
+
+.home-card > a {
+  display: flex;
+  background-color: #1da2fa;
+  height: 35px;
+  outline: none;
+  position: relative;
+  border: none;
+  color: white;
+  font-size: 15px;
+  cursor: pointer;
+  justify-content: center;
+  align-items: center;
+  text-decoration: none;
+  margin-top: 7px;
+  color: white;
+}
+
+.card-tag {
+  width: 70px;
+  position: absolute;
+  font-size: 12px;
+  background-color: lightgreen;
+  display: flex;
+  justify-content: center;
+  border-radius: 3px;
+}
+
+.card-tag > p {
+  margin: 0px;
+}
+
+.create-action {
+  width: fit-content;
+  position: absolute;
+  bottom: 20px;
+  right: 20px;
+  background-color: #1da2fa;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  color: white;
+  border-radius: 10px;
+  padding: 10px;
+}
+
+.create-action > a {
+  font-size: 20px;
+  cursor: pointer;
+  text-decoration: none;
+}
+
+.search-container {
+  display: flex;
+  justify-content: center;
+  padding: 30px;
+}
+
+.search-container > form > input {
+  width: 300px;
+  height: 40px;
+  border: 1px solid #cfcfcf;
+  border-radius: 10px;
+}
+
+.search-container > form > button {
+  margin-left: 10px;
+  background-color: #1da2fa;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  width: 75px;
+  height: 35px;
+}
+
+.action-like {
+  cursor: pointer;
+  display: flex;
+  height: 16px;
+}
+.home-card-info {
+  display: flex;
+  align-items: center;
+  flex-direction: row-reverse;
+  justify-content: space-between;
+  padding: 0px 5px;
 }

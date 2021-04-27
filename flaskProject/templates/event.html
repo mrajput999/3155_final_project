@@ -1,0 +1,67 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+  	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='event.css') }}">
+	<title>Document</title>
+</head>
+<body>
+	<div class="navbar-container">
+		<div>
+			<p><a class="navbar-logo" href="{{url_for('index')}}"><span style="color:#00a3ff">Hydro</span>Homies Event Planner</a></p>
+		</div>
+		<div>
+			{% if user %}
+				<a class="navbar-button" href="/home">All Events</a>
+				<a class="navbar-button" href="/events/favorite/{{user_id}}">Favorite Events</a>
+				<a class="navbar-button" href="/logout">Logout</a>
+			{% else %}
+				<a class="navbar-button " href="/login">Login</a>
+				<a class="navbar-button" href="/register">Register</a>
+			{% endif %}
+		</div>
+	</div>
+	<div class="event-container">
+		<div class="event-card">
+
+			<p class="event-card-title">{{event.title}}</p>
+			<p class="event-card-subheading">{{event.date}}</p>
+			<p class="event-card-body">{{event.description}} </p>
+			<!-- <div>
+				<button>RSVP</button>
+				<div>
+					<p>Fav</p>
+					<p>Like</p>
+				</div>
+			</div> -->
+			{% if contains %}
+			<form action="/unrsvp/{{rsvpId}}" method="POST">
+			<button class="card-unrsvp">unRsvp</button>
+				{% else %}
+			<form action="/rsvp/{{event.id}}" method="POST">
+			<button class="card-rsvp">Rsvp</button>
+			{% endif %}
+			</form>
+			{% if event.userId == user_id  %}
+			<div class='event-card-action'>
+				<a href="{{url_for('editEvent', eventId=event.id)}}" style="background-color: #1da2fa;"  >Edit</a>
+				<a href="{{url_for('deleteEvent', eventId=event.id)}}" style="background-color: #f14242;" >Delete</a>
+			</div>
+			{% endif %}
+		</div>
+		<div class="event-card">
+			<h4>List of Attendees</h4>
+			{% for attendee in attendees %}
+			<p>{{attendee.last_name}}, {{attendee.first_name}}</p>
+			{% endfor %}
+			{% if attendees == [] %}
+			<p>No sign ups!</p>
+			{% endif %}
+
+		</div>
+	</div>
+</body>
+</html>

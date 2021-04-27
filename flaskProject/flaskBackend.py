@@ -7,8 +7,9 @@ from flask import render_template
 from flask import request
 from flask import redirect, url_for
 from database import db
-# from models import Note as Note
+from models import Like as Like
 from models import User as User
+from models import Rsvp as Rsvp
 from models import EventCounter as eventCounter
 from models import Event as Event
 from forms import RegisterForm, LoginForm
@@ -60,26 +61,18 @@ def login():
 def register():
     form = RegisterForm()
     if request.method == 'POST' and form.validate_on_submit():
-        # salt and hash password
         h_password = bcrypt.hashpw(
             request.form['password'].encode('utf-8'), bcrypt.gensalt())
-        # get entered user data
         first_name = request.form['firstname']
         last_name = request.form['lastname']
-        # create user model
         new_user = User(first_name, last_name,
                         request.form['email'], h_password)
-        # add user to database and commit
         db.session.add(new_user)
         db.session.commit()
-        # save the user's name to the session
         session['user'] = first_name
-        # access id value from user model of this newly added user
         session['user_id'] = new_user.id
-        # show user dashboard view
         return redirect(url_for('index'))
 
-    # something went wrong - display register view
     return render_template('register.html', form=form)
 
 
@@ -87,11 +80,18 @@ def register():
 def getHome():
     if session.get("user"):
         events = db.session.query(Event).all()
-        print(events)
         event_res = []
         for event in events:
+            event.likes = len(db.session.query(
+                Like).filter_by(eventId=event.id).all())
+            event.likeUserId = db.session.query(Like).filter_by(
+                eventId=event.id, userId=session['user_id']).first()
+            if event.likeUserId:
+                event.likeUserId = event.likeUserId.id
             if not event.date:
                 event.date = "date not provided"
+        print(event.likes)
+        print(event.likeUserId)
         return render_template("home.html", user=session['user'], user_id=session['user_id'], events=events)
     else:
         return redirect(url_for('login'))
@@ -124,14 +124,85 @@ def create_event():
         return redirect(url_for('login'))
 
 
-@app.route("/edit-event/<eventId>")  # Edit Page
-def getEdit():
-    return "Edit Event Page"
+@app.route("/edit-event/<eventId>", methods=["POST", "GET"])  # Edit Page
+def editEvent(eventId):
+    if session.get("user"):
+        event = db.session.query(Event).filter_by(
+            id=eventId).first()
+        if request.method == "POST":
+            title = request.form["title"]
+            description = request.form["description"]
+            date = request.form["date"]
+            event.title = title
+            event.description = description
+            event.date = date
+            db.session.add(event)
+            db.session.commit()
+            return redirect(url_for('getHome'))
+        else:
+            if event.userId == session["user_id"]:
+                if not event.date:
+                    event.date = ""
+                if not event.title:
+                    event.title = ""
+                if not event.description:
+                    event.description = ""
+                return render_template('newEvent.html', event=event, user=session['user'], user_id=session["user_id"])
+            else:
+                return redirect(url_for('getHome'))
+    else:
+        return redirect(url_for("login"))
+
+
+@app.route("/event/delete/<eventId>")  # Delete event
+def deleteEvent(eventId):
+    if session.get("user"):
+        event = db.session.query(Event).filter_by(id=eventId).first()
+        if event.userId == session["user_id"]:
+            db.session.delete(event)
+            db.session.commit()
+        return redirect(url_for("getHome"))
+    else:
+        return redirect(url_for("login"))
+
+
+def getAttendess(eventId):
+    rsvps = db.session.query(Rsvp).filter_by(eventId=eventId).all()
+    attendess = []
+    for rsvp in rsvps:
+        userId = rsvp.userId
+        user = db.session.query(User).filter_by(id=userId).first()
+        attendess.append(user)
+    return attendess
 
 
 @app.route("/event/<eventId>")  # Event Page
-def getEvent():
-    return "get event page"
+def event(eventId):
+    if session.get("user"):
+        event = db.session.query(Event).filter_by(
+            id=eventId).first()
+        event.views += 1
+        db.session.add(event)
+        db.session.commit()
+        rsvp = db.session.query(Rsvp).filter_by(eventId=eventId).all()
+        users = []
+        containsUser = False
+        rsvpId = None
+        for i in rsvp:
+            users.append(db.session.query(User).filter_by(id=i.userId).first())
+            if session["user_id"] == i.userId:
+                rsvpId = i.id
+                containsUser = True
+
+        return render_template('event.html',
+                               user_id=session["user_id"],
+                               user=session["user"],
+                               event=event,
+                               attendees=users,
+                               contains=containsUser,
+                               rsvpId=rsvpId)
+    else:
+        return redirect(url_for('login'))
 
 
 @app.route("/logout")  # logout page
@@ -139,7 +210,69 @@ def logout():
     if session.get("user"):
         session.clear()
     return redirect(url_for('index'))
-    #Redirect to the home page#
+
+
+@app.route("/rsvp/<eventId>", methods=["POST"])
+def rsvp(eventId):
+    if session.get("user"):
+        isUser = db.session.query(Rsvp).filter_by(
+            userId=4).first()
+        if not isUser:
+            rsvp = Rsvp(session['user_id'], eventId)
+            db.session.add(rsvp)
+            db.session.commit()
+        return redirect(url_for('event', eventId=eventId))
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route("/unrsvp/<rsvpId>", methods=["POST"])
+def unrsvp(rsvpId):
+    if session.get("user"):
+        rsvp = db.session.query(Rsvp).filter_by(id=rsvpId).first()
+        print(rsvp)
+        if rsvp:
+            eventId = rsvp.eventId
+            db.session.delete(rsvp)
+            db.session.commit()
+            return redirect(url_for('event', eventId=eventId))
+        return redirect(url_for('getHome'))
+
+    else:
+        return redirect_url('login')
+
+
+@app.route("/search", methods=["POST"])
+def search():
+
+    if session.get('user'):
+        term = request.form['search']
+        events = db.session.query(Event).filter(Event.title.contains(term))
+        return render_template("home.html", user=session['user'], user_id=session['user_id'], events=events)
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/event/like/<eventId>')
+def like(eventId):
+    if session.get("user"):
+        like = Like(session["user_id"], eventId)
+        db.session.add(like)
+        db.session.commit()
+        return redirect(url_for('getHome'))
+    else:
+        return redirect(url_for('login'))
+
+
+@app.route('/event/dislike/<likeId>')
+def dislike(likeId):
+    if session.get("user"):
+        like = db.session.query(Like).filter_by(id=likeId).first()
+        db.session.delete(like)
+        db.session.commit()
+        return redirect(url_for('getHome'))
+    else:
+        return redirect(url_for('login'))
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(

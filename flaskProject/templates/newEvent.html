@@ -29,13 +29,17 @@
 			<div>
 				<p class="new-title">Create a new event.</p>
 			</div>
+			{% if event %}
+			<form class="new-info" method="POST" action="{{url_for('editEvent', eventId=event.id)}}"  >
+			{% else %}
 			<form class="new-info" method="POST" action="{{url_for('create_event')}}"  >
+			{% endif %}
 				<label>Title</label>
 				<input type="text" name="title" value="{% if event %}{{event.title}}{% endif %}"/>
 				<label>Description</label>
-				<textarea rows="7" name="description">hello</textarea>
+				<textarea rows="7" name="description">{% if event %}{{event.description}}{% else %}Type here {% endif %} </textarea>
 				<label>Date</label>
-				<input type="date" id="start" name="date">
+				<input value="{% if event%}{{event.date}}{% endif %}" type="date" id="start" name="date">
 				<button>Submit</button>
 			</form>			
 		</div>
