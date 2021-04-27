@@ -62,12 +62,16 @@ class Like(db.Model):
     def __init__(self, userId, eventId):
         self.userId = userId
         self.eventId = eventId
-# class EventUserAssociation(db.Model):
-#     pass
-#     '''
-#      userId
-#      eventId
-#     '''
+
+
+class FavoriteEvent(db.Model):
+    id = db.Column("id", db.Integer, primary_key=True)
+    userId = db.Column(db.Integer, db.ForeignKey("user.id"), nullable=False)
+    eventId = db.Column(db.Integer, db.ForeignKey("event.id"), nullable=False)
+
+    def __init__(self, userId, eventId):
+        self.userId = userId
+        self.eventId = eventId
 
 
 class EventCounter(db.Model):

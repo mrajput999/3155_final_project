@@ -6,6 +6,7 @@
   flex-direction: column;
   margin-top: 40px;
   border-radius: 5px;
+  position: relative;
 }
 
 .home-card > p {
@@ -116,4 +117,10 @@
   flex-direction: row-reverse;
   justify-content: space-between;
   padding: 0px 5px;
+}
+
+.favicon {
+  position: absolute;
+  right: 5px;
+  top: 5px;
 }

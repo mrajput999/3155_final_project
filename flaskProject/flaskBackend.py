@@ -12,6 +12,7 @@ from models import User as User
 from models import Rsvp as Rsvp
 from models import EventCounter as eventCounter
 from models import Event as Event
+from models import FavoriteEvent as FavoriteEvent
 from forms import RegisterForm, LoginForm
 from flask import session
 import bcrypt
@@ -86,12 +87,15 @@ def getHome():
                 Like).filter_by(eventId=event.id).all())
             event.likeUserId = db.session.query(Like).filter_by(
                 eventId=event.id, userId=session['user_id']).first()
+            if db.session.query(FavoriteEvent).filter_by(eventId=event.id, userId=session["user_id"]).first():
+                event.isFavorited = True
+            else:
+                event.isFavorited = False
             if event.likeUserId:
                 event.likeUserId = event.likeUserId.id
             if not event.date:
                 event.date = "date not provided"
-        print(event.likes)
-        print(event.likeUserId)
+
         return render_template("home.html", user=session['user'], user_id=session['user_id'], events=events)
     else:
         return redirect(url_for('login'))
@@ -216,7 +220,7 @@ def logout():
 def rsvp(eventId):
     if session.get("user"):
         isUser = db.session.query(Rsvp).filter_by(
-            userId=4).first()
+            userId=session['user_id']).first()
         if not isUser:
             rsvp = Rsvp(session['user_id'], eventId)
             db.session.add(rsvp)
@@ -273,6 +277,45 @@ def dislike(likeId):
         return redirect(url_for('getHome'))
     else:
         return redirect(url_for('login'))
+
+
+@app.route("/events/favorites/")
+def favoriteEvents():
+    if session.get("user"):
+        favorites = db.session.query(FavoriteEvent).filter_by(
+            userId=session['user_id']).all()
+        favEvents = []
+        for favorite in favorites:
+            event = db.session.query(
+                Event).filter_by(id=favorite.eventId).all()
+            event.likes = len(db.session.query(
+                Like).filter_by(eventId=event.id).all())
+        return render_template('favorites.html', userId=session["user_id"], user=session['user'], events=favEvents)
+    else:
+        return redirect(url_for('index'))
+
+
+@app.route("/favorite/<eventId>")
+def favorite(eventId):
+    if session.get("user"):
+        if not db.session.query(FavoriteEvent).filter_by(eventId=eventId, userId=session["user_id"]).first():
+            fav = FavoriteEvent(session["user_id"], eventId)
+            db.session.add(fav)
+            db.session.commmit()
+    else:
+        return redirect(url_for("index"))
+
+
+@app.route("/unfavorite/<eventId>")
+def unfavorite(eventId):
+    if session.get("user"):
+        fav = db.session.query(FavoriteEvent).filter_by(
+            eventId=eventId, userId=session["user_id"]).first()
+        if fav:
+            db.session.delete(fav)
+            db.session.commmit()
+    else:
+        return redirect(url_for("index"))
 
 
 app.run(host=os.getenv('IP', '127.0.0.1'), port=int(

@@ -19,7 +19,7 @@
 		<div>
 			{% if user %}
 				<a style="color:white" class="navbar-button" href="/home">All Events</a>
-				<a style="color:white" class="navbar-button" href="/events/favorite/{{user_id}}">Favorite Events</a>
+				<a style="color:white" class="navbar-button" href="/events/favorites/">Favorite Events</a>
 				<a style="color:white" class="navbar-button" href="/logout">Logout</a>
 			{% else %}
 				<a class="navbar-button " href="/login">Login</a>
@@ -38,6 +38,15 @@
 			{% for event in events %}
 			<div style="display: flex;justify-content: center;" class="col-sm">
 				<div class="home-card">
+					{% if event.isFavorited %}
+					<div class="favicon">
+						<a><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24"><path d="M12 .288l2.833 8.718h9.167l-7.417 5.389 2.833 8.718-7.416-5.388-7.417 5.388 2.833-8.718-7.416-5.389h9.167z"/></svg></a>
+					</div>
+					{% else %}
+					<div class='favicon'>
+						<a><svg width="24" height="24" xmlns="http://www.w3.org/2000/svg" fill-rule="evenodd" clip-rule="evenodd"><path d="M15.668 8.626l8.332 1.159-6.065 5.874 1.48 8.341-7.416-3.997-7.416 3.997 1.481-8.341-6.064-5.874 8.331-1.159 3.668-7.626 3.669 7.626zm-6.67.925l-6.818.948 4.963 4.807-1.212 6.825 6.068-3.271 6.069 3.271-1.212-6.826 4.964-4.806-6.819-.948-3.002-6.241-3.001 6.241z"/></svg></a>
+					</div>
+					{% endif %}
 					<p style="text-transform: capitalize;font-size: 20px;text-align: center;padding-top: 10px;">{{event.title}}</p>
 					<p style="color: grey;font-size: 12px;text-align: center;">{{event.date}}</p>
 					<div class="home-card-body">

@@ -5,7 +5,7 @@
 	<link rel="preconnect" href="https://fonts.gstatic.com">
   	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500&display=swap" rel="stylesheet">
 	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
-	<link rel="stylesheet" href="{{ url_for('static', filename='index.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='favorites.css') }}">
 	<title>Document</title>
 </head>
 <body>
@@ -25,14 +25,21 @@
 		</div>
 	</div>
 
-	<div class="home-container">
+	<div class="container">
 		<div>
-			<p class="home-title">Welcome to the Event Planner</p>
+			<h3>Favorite Events</h3>
 		</div>
-		<div class="home-subheading">
-			<p><span style="color: #00a3ff;">{{eventCount}}</span> events created in our app!</p>
+		<div>
+			{% for event in events %}
+			<div class="favorite-card">
+				<p class="fav-info">{{event.title}}</p>
+				<p class="fav-info">{{event.views}} Views</p>
+				<p class="fav-info">{{event.likes}} likes</p>
+			</div>
+			{% endfor %}
 		</div>
 	</div>
+
 	
 </body>
 </html>
