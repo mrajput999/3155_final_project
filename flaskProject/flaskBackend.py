@@ -287,9 +287,10 @@ def favoriteEvents():
         favEvents = []
         for favorite in favorites:
             event = db.session.query(
-                Event).filter_by(id=favorite.eventId).all()
+                Event).filter_by(id=favorite.eventId).first()
             event.likes = len(db.session.query(
                 Like).filter_by(eventId=event.id).all())
+            favEvents.append(event)
         return render_template('favorites.html', userId=session["user_id"], user=session['user'], events=favEvents)
     else:
         return redirect(url_for('index'))
@@ -298,10 +299,12 @@ def favoriteEvents():
 @app.route("/favorite/<eventId>")
 def favorite(eventId):
     if session.get("user"):
+        print("here")
         if not db.session.query(FavoriteEvent).filter_by(eventId=eventId, userId=session["user_id"]).first():
             fav = FavoriteEvent(session["user_id"], eventId)
             db.session.add(fav)
-            db.session.commmit()
+            db.session.commit()
+        return redirect(url_for("getHome"))
     else:
         return redirect(url_for("index"))
 
@@ -313,7 +316,8 @@ def unfavorite(eventId):
             eventId=eventId, userId=session["user_id"]).first()
         if fav:
             db.session.delete(fav)
-            db.session.commmit()
+            db.session.commit()
+        return redirect(url_for("getHome"))
     else:
         return redirect(url_for("index"))
 
