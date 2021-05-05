@@ -1,0 +1,49 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+	<meta charset="UTF-8">
+	<link rel="preconnect" href="https://fonts.gstatic.com">
+  	<link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;1,100;1,300;1,400;1,500&display=swap" rel="stylesheet">
+	<link rel="stylesheet" href="{{ url_for('static', filename='main.css') }}">
+	<link rel="stylesheet" href="{{ url_for('static', filename='newEvent.css') }}">
+	<title>Document</title>
+</head>
+<body>
+	<div class="navbar-container">
+		<div>
+			<p><a class="navbar-logo" href="{{url_for('index')}}"><span style="color:#00a3ff">Hydro</span>Homies Event Planner</a></p>
+		</div>
+		<div>
+			{% if user %}
+				<a class="navbar-button" href="/home">All Events</a>
+				<a class="navbar-button" href="/events/favorites/">Favorite Events</a>
+				<a class="navbar-button" href="/logout">Logout</a>
+			{% else %}
+				<a class="navbar-button " href="/login">Login</a>
+				<a class="navbar-button" href="/register">Register</a>
+			{% endif %}
+		</div>
+	</div>
+	<div class="new-container">
+		<div class="new-card">
+			<div>
+				<p class="new-title">Create a new event.</p>
+			</div>
+			{% if event %}
+			<form class="new-info" method="POST" action="{{url_for('editEvent', eventId=event.id)}}"  >
+			{% else %}
+			<form class="new-info" method="POST" action="{{url_for('create_event')}}"  >
+			{% endif %}
+				<label>Title</label>
+				<input type="text" name="title" value="{% if event %}{{event.title}}{% endif %}"/>
+				<label>Description</label>
+				<textarea rows="7" name="description">{% if event %}{{event.description}}{% else %}Type here {% endif %} </textarea>
+				<label>Date</label>
+				<input value="{% if event%}{{event.date}}{% endif %}" type="date" id="start" name="date">
+				<button>Submit</button>
+			</form>			
+		</div>
+	</div>
+	
+</body>
+</html>
