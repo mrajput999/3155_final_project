@@ -1,7 +1,7 @@
 .home-card {
   width: 300px;
   box-shadow: 0 19px 38px rgb(0 0 0 / 30%), 0 15px 12px rgb(0 0 0 / 22%);
-  height: 150px;
+  height: 200px;
   display: flex;
   flex-direction: column;
   margin-top: 40px;
