@@ -1,4 +1,5 @@
 .home-card {
+  justify-content: center;
   width: 300px;
   box-shadow: 0 19px 38px rgb(0 0 0 / 30%), 0 15px 12px rgb(0 0 0 / 22%);
   height: 200px;
